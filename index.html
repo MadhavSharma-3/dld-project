@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Light FSM</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the lights */
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Base light 'off' state */
+        .light {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #333; /* Off state */
+            border: 2px solid #111;
+            transition: all 0.2s ease;
+        }
+        @media (max-width: 640px) {
+            .light { width: 30px; height: 30px; }
+        }
+        
+        /* Light 'on' states */
+        .red-on { background-color: #ef4444; box-shadow: 0 0 20px #ef4444; }
+        .yellow-on { background-color: #f59e0b; box-shadow: 0 0 20px #f59e0b; }
+        .green-on { background-color: #22c55e; box-shadow: 0 0 20px #22c55e; }
+
+        /* Pedestrian icon 'off' state */
+        .ped-icon {
+            fill: #444;
+            transition: all 0.2s ease;
+        }
+
+        /* Pedestrian icon 'on' states */
+        .ped-walk-on { fill: #22c55e; filter: drop-shadow(0 0 10px #22c55e); }
+        .ped-dont-walk-on { fill: #ef4444; filter: drop-shadow(0 0 10px #ef4444); }
+        
+        /* The black box for the lights */
+        .traffic-light-box {
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            padding: 12px;
+            border: 2px solid #000;
+        }
+
+        /* The black box for the pedestrian signals */
+        .ped-signal-box {
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            padding: 12px;
+            border: 2px solid #000;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden">
+
+    <h1 class="text-3xl font-bold text-center mb-6">Traffic Light FSM Controller</h1>
+
+    <!-- Intersection Grid -->
+    <div class="grid grid-cols-3 grid-rows-3 gap-2 w-full max-w-xl aspect-square">
+        
+        <!-- Top-Left Corner (Empty) -->
+        <div class="col-start-1 row-start-1"></div>
+
+        <!-- North Signal -->
+        <div class="col-start-2 row-start-1 flex flex-col items-center justify-end">
+            <!-- North Ped Signal -->
+            <div class="ped-signal-box mb-2">
+                <svg id="ped-n-dont" class="ped-icon w-8 h-8" viewBox="0 0 256 256"><path d="M141.66,133.66l-20-20,20-20a8,8,0,0,0-11.32-11.32l-20,20-20-20a8,8,0,0,0-11.32,11.32l20,20-20,20a8,8,0,0,0,11.32,11.32l20-20,20,20a8,8,0,0,0,11.32-11.32ZM224,128a96,96,0,1,1-96-96A96,96,0,0,1,224,128Zm-16,0a80,80,0,1,0-80,80A80,80,0,0,0,208,128Z"></path></svg>
+                <svg id="ped-n-walk" class="ped-icon w-8 h-8" viewBox="0 0 256 256"><path d="M152,216V164.33l-24.89-16.6-4.22,46.42a8,8,0,1,1-15.78-1.44l4.67-51.35a8,8,0,0,1,6.33-7.27l32-8.73a8,8,0,0,1,8.73,6.33L160,152v64a8,8,0,0,1-16,0Zm51.34-118a8,8,0,0,0-8.8-7.14l-48,8a8,8,0,0,0-6.33,7.27l-5.34,58.73a8,8,0,1,0,15.78,1.44L155,115.3l37.56-6.26a8,8,0,0,0,7.14-8.8ZM120,60a28,28,0,1,0-28-28A28,28,0,0,0,120,60Zm0-40a12,12,0,1,1-12,12A12,12,0,0,1,120,20Z"></path></svg>
+            </div>
+            <!-- North Traffic Light -->
+            <div class="traffic-light-box flex flex-col space-y-2">
+                <div id="n-red" class="light"></div>
+                <div id="n-yellow" class="light"></div>
+                <div id="n-green" class="light"></div>
+            </div>
+        </div>
+
+        <!-- Top-Right Corner (Empty) -->
+        <div class="col-start-3 row-start-1"></div>
+
+        <!-- West Signal -->
+        <div class="col-start-1 row-start-2 flex items-center justify-end">
+             <!-- West Ped Signal -->
+             <div class="ped-signal-box mr-2 flex">
+                <svg id="ped-w-dont" class="ped-icon w-8 h-8" viewBox="0 0 256 256"><path d="M141.66,133.66l-20-20,20-20a8,8,0,0,0-11.32-11.32l-20,20-20-20a8,8,0,0,0-11.32,11.32l20,20-20,20a8,8,0,0,0,11.32,11.32l20-20,20,20a8,8,0,0,0,11.32-11.32ZM224,128a96,96,0,1,1-96-96A96,96,0,0,1,224,128Zm-16,0a80,80,0,1,0-80,80A80,80,0,0,0,208,128Z"></path></svg>
+                <svg id="ped-w-walk" class="ped-icon w-8 h-8" viewBox="0 0 256 256"><path d="M152,216V164.33l-24.89-16.6-4.22,46.42a8,8,0,1,1-15.78-1.44l4.67-51.35a8,8,0,0,1,6.33-7.27l32-8.73a8,8,0,0,1,8.73,6.33L160,152v64a8,8,0,0,1-16,0Zm51.34-118a8,8,0,0,0-8.8-7.14l-48,8a8,8,0,0,0-6.33,7.27l-5.34,58.73a8,8,0,1,0,15.78,1.44L155,115.3l37.56-6.26a8,8,0,0,0,7.14-8.8ZM120,60a28,28,0,1,0-28-28A28,28,0,0,0,120,60Zm0-40a12,12,0,1,1-12,12A12,12,0,0,1,120,20Z"></path></svg>
+            </div>
+            <!-- West Traffic Light -->
+            <div class="traffic-light-box flex space-x-2">
+                <div id="w-red" class="light"></div>
+                <div id="w-yellow" class="light"></div>
+                <div id="w-green" class="light"></div>
+            </div>
+        </div>
+
+        <!-- Center Panel -->
+        <div class="col-start-2 row-start-2 bg-gray-700 p-4 rounded-lg shadow-inner text-center flex flex-col justify-center items-center">
+            <div class="text-lg font-medium">FSM State</div>
+            <div id="fsm-state" class="text-2xl font-bold text-cyan-400">...</div>
+            <div class="text-lg font-medium mt-2">Timer</div>
+            <div id="fsm-timer" class="text-2xl font-bold text-cyan-400">...</div>
+        </div>
+
+        <!-- East Signal -->
+        <div class="col-start-3 row-start-2 flex items-center justify-start">
+            <!-- East Traffic Light -->
+            <div class="traffic-light-box flex space-x-2">
+                <div id="e-red" class="light"></div>
+                <div id="e-yellow" class="light"></div>
+                <div id="e-green" class="light"></div>
+            </div>
+             <!-- East Ped Signal -->
+             <div class="ped-signal-box ml-2 flex">
+                <svg id="ped-e-dont" class="ped-icon w-8 h-8" viewBox="0 0 256 256"><path d="M141.66,133.66l-20-20,20-20a8,8,0,0,0-11.32-11.32l-20,20-20-20a8,8,0,0,0-11.32,11.32l20,20-20,20a8,8,0,0,0,11.32,11.32l20-20,20,20a8,8,0,0,0,11.32-11.32ZM224,128a96,96,0,1,1-96-96A96,96,0,0,1,224,128Zm-16,0a80,80,0,1,0-80,80A80,80,0,0,0,208,128Z"></path></svg>
+                <svg id="ped-e-walk" class="ped-icon w-8 h-8" viewBox="0 0 256 256"><path d="M152,216V164.33l-24.89-16.6-4.22,46.42a8,8,0,1,1-15.78-1.44l4.67-51.35a8,8,0,0,1,6.33-7.27l32-8.73a8,8,0,0,1,8.73,6.33L160,152v64a8,8,0,0,1-16,0Zm51.34-118a8,8,0,0,0-8.8-7.14l-48,8a8,8,0,0,0-6.33,7.27l-5.34,58.73a8,8,0,1,0,15.78,1.44L155,115.3l37.56-6.26a8,8,0,0,0,7.14-8.8ZM120,60a28,28,0,1,0-28-28A28,28,0,0,0,120,60Zm0-40a12,12,0,1,1-12,12A12,12,0,0,1,120,20Z"></path></svg>
+            </div>
+        </div>
+
+        <!-- Bottom-Left Corner (Empty) -->
+        <div class="col-start-1 row-start-3"></div>
+
+        <!-- South Signal -->
+        <div class="col-start-2 row-start-3 flex flex-col items-center justify-start">
+            <!-- South Traffic Light -->
+            <div class="traffic-light-box flex flex-col space-y-2">
+                <div id="s-red" class="light"></div>
+                <div id="s-yellow" class="light"></div>
+                <div id="s-green" class="light"></div>
+            </div>
+            <!-- South Ped Signal -->
+            <div class="ped-signal-box mt-2">
+                <svg id="ped-s-dont" class="ped-icon w-8 h-8" viewBox="0 0 256 256"><path d="M141.66,133.66l-20-20,20-20a8,8,0,0,0-11.32-11.32l-20,20-20-20a8,8,0,0,0-11.32,11.32l20,20-20,20a8,8,0,0,0,11.32,11.32l20-20,20,20a8,8,0,0,0,11.32-11.32ZM224,128a96,96,0,1,1-96-96A96,96,0,0,1,224,128Zm-16,0a80,80,0,1,0-80,80A80,80,0,0,0,208,128Z"></path></svg>
+                <svg id="ped-s-walk" class="ped-icon w-8 h-8" viewBox="0 0 256 256"><path d="M152,216V164.33l-24.89-16.6-4.22,46.42a8,8,0,1,1-15.78-1.44l4.67-51.35a8,8,0,0,1,6.33-7.27l32-8.73a8,8,0,0,1,8.73,6.33L160,152v64a8,8,0,0,1-16,0Zm51.34-118a8,8,0,0,0-8.8-7.14l-48,8a8,8,0,0,0-6.33,7.27l-5.34,58.73a8,8,0,1,0,15.78,1.44L155,115.3l37.56-6.26a8,8,0,0,0,7.14-8.8ZM120,60a28,28,0,1,0-28-28A28,28,0,0,0,120,60Zm0-40a12,12,0,1,1-12,12A12,12,0,0,1,120,20Z"></path></svg>
+            </div>
+        </div>
+
+        <!-- Bottom-Right Corner (Empty) -->
+        <div class="col-start-3 row-start-3"></div>
+    </div>
+
+    <!-- Control Buttons -->
+    <div class="flex justify-center gap-6 mt-8">
+        <button id="btn-ped-request" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-200 shadow-lg active:scale-95">
+            Pedestrian Request
+        </button>
+        <button id="btn-reset" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-200 shadow-lg active:scale-95">
+            Reset FSM
+        </button>
+    </div>
+
+    <script>
+        // Get all the light elements
+        const lights = {
+            // North
+            nRed: document.getElementById('n-red'),
+            nYellow: document.getElementById('n-yellow'),
+            nGreen: document.getElementById('n-green'),
+            // South
+            sRed: document.getElementById('s-red'),
+            sYellow: document.getElementById('s-yellow'),
+            sGreen: document.getElementById('s-green'),
+            // East
+            eRed: document.getElementById('e-red'),
+            eYellow: document.getElementById('e-yellow'),
+            eGreen: document.getElementById('e-green'),
+            // West
+            wRed: document.getElementById('w-red'),
+            wYellow: document.getElementById('w-yellow'),
+            wGreen: document.getElementById('w-green'),
+
+            // Pedestrian Icons
+            pedNWalk: document.getElementById('ped-n-walk'),
+            pedNDont: document.getElementById('ped-n-dont'),
+            pedSWalk: document.getElementById('ped-s-walk'),
+            pedSDont: document.getElementById('ped-s-dont'),
+            pedEWalk: document.getElementById('ped-e-walk'),
+            pedEDont: document.getElementById('ped-e-dont'),
+            pedWWalk: document.getElementById('ped-w-walk'),
+            pedWDont: document.getElementById('ped-w-dont')
+        };
+
+        const status = {
+            fsmState: document.getElementById('fsm-state'),
+            fsmTimer: document.getElementById('fsm-timer')
+        };
+        
+        // --- Update UI Function ---
+        function updateUI(fsmState) {
+            // Update FSM Status
+            status.fsmState.textContent = fsmState.state;
+            status.fsmTimer.textContent = fsmState.timer_count;
+
+            // NS Lights (R, Y, G) -> Controls North and South
+            const nsRedOn = fsmState.ns_light[0];
+            const nsYellowOn = fsmState.ns_light[1];
+            const nsGreenOn = fsmState.ns_light[2];
+
+            lights.nRed.classList.toggle('red-on', nsRedOn);
+            lights.nYellow.classList.toggle('yellow-on', nsYellowOn);
+            lights.nGreen.classList.toggle('green-on', nsGreenOn);
+            
+            lights.sRed.classList.toggle('red-on', nsRedOn);
+            lights.sYellow.classList.toggle('yellow-on', nsYellowOn);
+            lights.sGreen.classList.toggle('green-on', nsGreenOn);
+
+            
+            // EW Lights (R, Y, G) -> Controls East and West
+            const ewRedOn = fsmState.ew_light[0];
+            const ewYellowOn = fsmState.ew_light[1];
+            const ewGreenOn = fsmState.ew_light[2];
+
+            lights.eRed.classList.toggle('red-on', ewRedOn);
+            lights.eYellow.classList.toggle('yellow-on', ewYellowOn);
+            lights.eGreen.classList.toggle('green-on', ewGreenOn);
+
+            lights.wRed.classList.toggle('red-on', ewRedOn);
+            lights.wYellow.classList.toggle('yellow-on', ewYellowOn);
+            lights.wGreen.classList.toggle('green-on', ewGreenOn);
+
+
+            // Ped Lights (Don't Walk, Walk) -> Controls all 4 signals
+            const pedDontWalkOn = fsmState.ped_light[0];
+            const pedWalkOn = fsmState.ped_light[1];
+
+            lights.pedNDont.classList.toggle('ped-dont-walk-on', pedDontWalkOn);
+            lights.pedNWalk.classList.toggle('ped-walk-on', pedWalkOn);
+            
+            lights.pedSDont.classList.toggle('ped-dont-walk-on', pedDontWalkOn);
+            lights.pedSWalk.classList.toggle('ped-walk-on', pedWalkOn);
+
+            lights.pedEDont.classList.toggle('ped-dont-walk-on', pedDontWalkOn);
+            lights.pedEWalk.classList.toggle('ped-walk-on', pedWalkOn);
+
+            lights.pedWDont.classList.toggle('ped-dont-walk-on', pedDontWalkOn);
+            lights.pedWWalk.classList.toggle('ped-walk-on', pedWalkOn);
+        }
+
+        // --- Fetch Status from Server ---
+        async function fetchStatus() {
+            try {
+                const response = await fetch('/api/status');
+                if (!response.ok) throw new Error('Network response was not ok');
+                const fsmState = await response.json();
+                updateUI(fsmState);
+            } catch (error) {
+                console.error('Error fetching FSM status:', error);
+                // Show error state?
+                status.fsmState.textContent = "Error";
+                status.fsmTimer.textContent = "---";
+            }
+        }
+
+        // --- Send Input to Server ---
+        async function sendInput(signalType) {
+            try {
+                await fetch('/api/input', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ signal: signalType })
+                });
+                // Immediately fetch status to reflect reset
+                if (signalType === 'reset') {
+                    fetchStatus();
+                }
+            } catch (error) {
+                console.error('Error sending input:', error);
+            }
+        }
+
+        // --- Event Listeners ---
+        document.getElementById('btn-ped-request').addEventListener('click', () => sendInput('pedestrian_request'));
+        document.getElementById('btn-reset').addEventListener('click', () => sendInput('reset'));
+
+        // --- Start Polling ---
+        // Fetch status immediately on load, then poll every 500ms
+        fetchStatus();
+        setInterval(fetchStatus, 500); 
+    </script>
+
+</body>
+</html>
