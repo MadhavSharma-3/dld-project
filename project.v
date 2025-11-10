@@ -1,17 +1,19 @@
 `timescale 1ns / 1ps
 
+// In project.v
 module traffic_light_controller (
     input wire clk,
     input wire reset,
     input wire pedestrian_request,
 
-    // Outputs (Moore machine, so these depend only on state)
-    output reg [2:0] ns_light,       // North-South: 3'b100=G, 3'b010=Y, 3'b001=R
-    output reg [2:0] ew_light,       // East-West:   3'b100=G, 3'b010=Y, 3'b001=R
-    output reg [1:0] ped_light,      // Pedestrian:  2'b10=WALK, 2'b01=DON'T WALK
-    output wire [2:0] current_state, // Expose current state for testbench
-    output wire ped_request_latched_out, // Debugging
-    output wire was_in_ns_phase_out    // Debugging
+    // Outputs
+    output reg [2:0] ns_light,
+    output reg [2:0] ew_light,
+    output reg [1:0] ped_light,
+    output wire [2:0] current_state,
+    output wire [3:0] timer_count_out, // <-- ADD THIS LINE
+    output wire ped_request_latched_out,
+    output wire was_in_ns_phase_out
 );
 
     // --- State Definitions ---
@@ -169,4 +171,5 @@ module traffic_light_controller (
     assign ped_request_latched_out = ped_request_latched;
     assign was_in_ns_phase_out = was_in_ns_phase;
 
+    assign timer_count_out = timer_count; 
 endmodule

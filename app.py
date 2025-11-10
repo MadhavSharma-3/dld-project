@@ -17,9 +17,11 @@ STATUS_FILE = "status.json"
 g_last_known_state = {
     "state": "STARTING", 
     "timer_count": 0, 
-    "ns_light": (1,0,0), 
-    "ew_light": (1,0,0), 
-    "ped_light": (1,0)
+    # Use booleans and the (R, Y, G) order
+    "ns_light": [True, False, False],  # Red
+    "ew_light": [True, False, False],  # Red
+    # Use booleans and the (DONT, WALK) order
+    "ped_light": [True, False]         # Don't Walk
 }
 # --- End of Fix ---
 
@@ -38,8 +40,25 @@ def run_cocotb():
         os.remove(STATUS_FILE)
 
     try:
-        # Run 'make sim' to start the cocotb simulation
-        subprocess.run(["make", "sim"], check=True, stdin=subprocess.DEVNULL)
+        # --- THIS IS THE FIX ---
+        # We must set PYTHONUNBUFFERED=1 so that the 'await Timer(1, 'sec')'
+        # actually pauses the simulation in real-time.
+        
+        # 1. Get the current environment variables
+        my_env = os.environ.copy()
+        
+        # 2. Add the unbuffered flag
+        my_env["PYTHONUNBUFFERED"] = "1"
+        
+        # 3. Run 'make sim' using the new environment
+        subprocess.run(
+            ["make", "sim"], 
+            check=True, 
+            stdin=subprocess.DEVNULL, 
+            env=my_env  # <-- Use the modified environment
+        )
+        # --- END OF FIX ---
+        
     except Exception as e:
         print(f"[cocotb Process] Simulation failed: {e}")
     finally:

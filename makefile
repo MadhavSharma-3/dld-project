@@ -11,7 +11,7 @@ VPATH = .
 
 # VERILOG_SOURCES is a list of all Verilog files
 # We MUST include all .v files used in the design
-VERILOG_SOURCES=project.v tb_project.v
+VERILOG_SOURCES=project.v
 
 # TOPLEVEL is the Verilog module that cocotb will drive
 # This MUST match the module name inside your project.v file
