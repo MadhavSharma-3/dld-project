@@ -1,7 +1,7 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1762802284" />
-    <testcase name="run_fsm_simulation" classname="run_sim" file="C:\Users\hites\OneDrive\Desktop\tedious_works\antim_shanti\run_sim.py" lineno="40" time="149.25675511360168" sim_time_ns="2990.0" ratio_time="20.03259415444389">
+    <property name="random_seed" value="1762803318" />
+    <testcase name="run_fsm_simulation" classname="run_sim" file="C:\Users\hites\OneDrive\Desktop\tedious_works\antim_shanti\run_sim.py" lineno="40" time="239.0283043384552" sim_time_ns="4770.0" ratio_time="19.95579566696778">
       <failure error_type="SimFailure" error_msg="Simulator shut down prematurely" />
     </testcase>
   </testsuite>

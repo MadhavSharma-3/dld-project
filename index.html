@@ -7,168 +7,210 @@
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styles for the lights */
-        body { font-family: 'Inter', sans-serif; }
-        
         /* Base light 'off' state */
         .light {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #2D3748; /* gray-800 */
+            border: 2px solid #1A202C; /* gray-900 */
+            transition: all 0.3s ease;
+            opacity: 0.3;
+        }
+
+        /* Light 'on' states with glow */
+        .red-on {
+            background-color: #FC8181; /* red-400 */
+            opacity: 1;
+            box-shadow: 0 0 15px 5px #EF4444; /* red-500 */
+        }
+        .yellow-on {
+            background-color: #FBD38D; /* yellow-300 */
+            opacity: 1;
+            box-shadow: 0 0 15px 5px #F59E0B; /* yellow-500 */
+        }
+        .green-on {
+            background-color: #9AE6B4; /* green-300 */
+            opacity: 1;
+            box-shadow: 0 0 15px 5px #22C55E; /* green-500 */
+        }
+
+        /* Base ped-light 'off' state */
+        .ped-light {
             width: 50px;
             height: 50px;
-            border-radius: 50%;
-            background-color: #333; /* Off state */
-            border: 2px solid #111;
-            transition: all 0.2s ease;
+            border-radius: 8px;
+            background-color: #2D3748; /* gray-800 */
+            border: 2px solid #1A202C; /* gray-900 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.3;
+            transition: all 0.3s ease;
         }
-        @media (max-width: 640px) {
-            .light { width: 30px; height: 30px; }
+        .ped-light svg {
+            width: 32px;
+            height: 32px;
+            fill: #4A5568; /* gray-600 */
         }
         
-        /* Light 'on' states */
-        .red-on { background-color: #ef4444; box-shadow: 0 0 20px #ef4444; }
-        .yellow-on { background-color: #f59e0b; box-shadow: 0 0 20px #f59e0b; }
-        .green-on { background-color: #22c55e; box-shadow: 0 0 20px #22c55e; }
-
-        /* Pedestrian icon 'off' state */
-        .ped-icon {
-            fill: #444;
-            transition: all 0.2s ease;
+        /* Ped-light 'on' states */
+        .ped-dont-walk-on {
+            background-color: #E53E3E; /* red-600 */
+            opacity: 1;
+            box-shadow: 0 0 15px 3px #E53E3E;
+        }
+        .ped-dont-walk-on svg {
+            fill: #FFF;
         }
 
-        /* Pedestrian icon 'on' states */
-        .ped-walk-on { fill: #22c55e; filter: drop-shadow(0 0 10px #22c55e); }
-        .ped-dont-walk-on { fill: #ef4444; filter: drop-shadow(0 0 10px #ef4444); }
+        .ped-walk-on {
+            background-color: #38A169; /* green-600 */
+            opacity: 1;
+            box-shadow: 0 0 15px 3px #38A169;
+        }
+        .ped-walk-on svg {
+            fill: #FFF;
+        }
         
         /* The black box for the lights */
         .traffic-light-box {
-            background-color: #1a1a1a;
-            border-radius: 8px;
+            background-color: #1A202C; /* gray-900 */
+            border-radius: 10px;
             padding: 12px;
             border: 2px solid #000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
-        /* The black box for the pedestrian signals */
-        .ped-signal-box {
-            background-color: #1a1a1a;
-            border-radius: 8px;
-            padding: 12px;
-            border: 2px solid #000;
-        }
     </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden">
+<body class="bg-gray-700 text-gray-200 min-h-screen flex flex-col items-center justify-center p-4">
 
-    <h1 class="text-3xl font-bold text-center mb-6">Traffic Light FSM Controller</h1>
+    <h1 class="text-4xl font-bold text-white text-center mb-8">Verilog FSM Controller</h1>
 
-    <!-- Intersection Grid -->
-    <div class="grid grid-cols-3 grid-rows-3 gap-2 w-full max-w-xl aspect-square">
-        
-        <!-- Top-Left Corner (Empty) -->
-        <div class="col-start-1 row-start-1"></div>
+    <!-- Main Intersection Layout -->
+    <div class="relative w-full max-w-3xl h-[600px] bg-gray-600 rounded-lg shadow-2xl p-8 overflow-hidden">
+        <!-- Roads -->
+        <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-40 bg-gray-800 shadow-inner"></div>
+        <div class="absolute inset-y-0 left-1/2 -translate-x-1/2 w-40 bg-gray-800 shadow-inner"></div>
 
         <!-- North Signal -->
-        <div class="col-start-2 row-start-1 flex flex-col items-center justify-end">
-            <!-- North Ped Signal -->
-            <div class="ped-signal-box mb-2">
-                <svg id="ped-n-dont" class="ped-icon w-8 h-8" viewBox="0 0 256 256"><path d="M141.66,133.66l-20-20,20-20a8,8,0,0,0-11.32-11.32l-20,20-20-20a8,8,0,0,0-11.32,11.32l20,20-20,20a8,8,0,0,0,11.32,11.32l20-20,20,20a8,8,0,0,0,11.32-11.32ZM224,128a96,96,0,1,1-96-96A96,96,0,0,1,224,128Zm-16,0a80,80,0,1,0-80,80A80,80,0,0,0,208,128Z"></path></svg>
-                <svg id="ped-n-walk" class="ped-icon w-8 h-8" viewBox="0 0 256 256"><path d="M152,216V164.33l-24.89-16.6-4.22,46.42a8,8,0,1,1-15.78-1.44l4.67-51.35a8,8,0,0,1,6.33-7.27l32-8.73a8,8,0,0,1,8.73,6.33L160,152v64a8,8,0,0,1-16,0Zm51.34-118a8,8,0,0,0-8.8-7.14l-48,8a8,8,0,0,0-6.33,7.27l-5.34,58.73a8,8,0,1,0,15.78,1.44L155,115.3l37.56-6.26a8,8,0,0,0,7.14-8.8ZM120,60a28,28,0,1,0-28-28A28,28,0,0,0,120,60Zm0-40a12,12,0,1,1-12,12A12,12,0,0,1,120,20Z"></path></svg>
-            </div>
-            <!-- North Traffic Light -->
+        <div class="absolute top-8 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-4">
             <div class="traffic-light-box flex flex-col space-y-2">
                 <div id="n-red" class="light"></div>
                 <div id="n-yellow" class="light"></div>
                 <div id="n-green" class="light"></div>
             </div>
+            <div id="ped-n-dont" class="ped-light">
+                <!-- Red Hand Icon -->
+                <svg viewBox="0 0 24 24"><path d="M16.5 20c.83 0 1.5-.67 1.5-1.5v-7c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5zm-4.5-1.5v-7c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5zm-3-1.5v-7c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5zM19 8.5v-4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v4c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5zM5 10c.83 0 1.5-.67 1.5-1.5v-4c0-.83-.67-1.5-1.5-1.5S3.5 3.67 3.5 4.5v4c0 .83.67 1.5 1.5 1.5zM18.2 9.5c.5-2.8-.5-5.6-2.6-7.5-1.3-1.2-3-1.9-4.8-2-1.8-.1-3.6.6-4.9 1.8-.7.6-1.3 1.4-1.8 2.2-.4.7-.7 1.5-.8 2.3-.1.8 0 1.6.2 2.4.2.8.5 1.5.9 2.2.4.7.9 1.3 1.5 1.8 1.2 1.2 2.8 1.9 4.4 2 1.6.1 3.2-.4 4.5-1.3.4-.3.8-.6 1.1-1 .3-.4.6-.8.8-1.2s.3-.9.4-1.4z"></path></svg>
+            </div>
+            <div id="ped-n-walk" class="ped-light">
+                <!-- Walk Icon -->
+                <svg viewBox="0 0 24 24"><path d="M14.5 9.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM12.5 12.4l-1.4 4 1.9.7 1.4-4c.1-.3 0-.6-.3-.7-.2-.1-.5 0-.6.2zM15 12.9c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM8.5 20v-5h-2v5c0 1.1.9 2 2 2s2-.9 2-2zM12.4 20c0-1.1.9-2 2-2s2 .9 2 2v-6.3l-1.9-.7 1.4 4.3c.2.6-.1 1.2-.7 1.4-.6.2-1.2-.1-1.4-.7l-1.4-4.3v6.3zM10.5 8.5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM6.5 13c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM8.5 8.5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM12 4.5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+            </div>
+        </div>
+        
+        <!-- South Signal -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col-reverse items-center space-y-4 space-y-reverse">
+            <div class="traffic-light-box flex flex-col-reverse space-y-2 space-y-reverse">
+                <div id="s-red" class="light"></div>
+                <div id="s-yellow" class="light"></div>
+                <div id="s-green" class="light"></div>
+            </div>
+            <div id="ped-s-dont" class="ped-light">
+                <!-- Red Hand Icon -->
+                <svg viewBox="0 0 24 24"><path d="M16.5 20c.83 0 1.5-.67 1.5-1.5v-7c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5zm-4.5-1.5v-7c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5zm-3-1.5v-7c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5zM19 8.5v-4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v4c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5zM5 10c.83 0 1.5-.67 1.5-1.5v-4c0-.83-.67-1.5-1.5-1.5S3.5 3.67 3.5 4.5v4c0 .83.67 1.5 1.5 1.5zM18.2 9.5c.5-2.8-.5-5.6-2.6-7.5-1.3-1.2-3-1.9-4.8-2-1.8-.1-3.6.6-4.9 1.8-.7.6-1.3 1.4-1.8 2.2-.4.7-.7 1.5-.8 2.3-.1.8 0 1.6.2 2.4.2.8.5 1.5.9 2.2.4.7.9 1.3 1.5 1.8 1.2 1.2 2.8 1.9 4.4 2 1.6.1 3.2-.4 4.5-1.3.4-.3.8-.6 1.1-1 .3-.4.6-.8.8-1.2s.3-.9.4-1.4z"></path></svg>
+            </div>
+            <div id="ped-s-walk" class="ped-light">
+                <!-- Walk Icon -->
+                <svg viewBox="0 0 24 24"><path d="M14.5 9.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM12.5 12.4l-1.4 4 1.9.7 1.4-4c.1-.3 0-.6-.3-.7-.2-.1-.5 0-.6.2zM15 12.9c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM8.5 20v-5h-2v5c0 1.1.9 2 2 2s2-.9 2-2zM12.4 20c0-1.1.9-2 2-2s2 .9 2 2v-6.3l-1.9-.7 1.4 4.3c.2.6-.1 1.2-.7 1.4-.6.2-1.2-.1-1.4-.7l-1.4-4.3v6.3zM10.5 8.5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM6.5 13c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM8.5 8.5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM12 4.5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+            </div>
         </div>
 
-        <!-- Top-Right Corner (Empty) -->
-        <div class="col-start-3 row-start-1"></div>
-
         <!-- West Signal -->
-        <div class="col-start-1 row-start-2 flex items-center justify-end">
-             <!-- West Ped Signal -->
-             <div class="ped-signal-box mr-2 flex">
-                <svg id="ped-w-dont" class="ped-icon w-8 h-8" viewBox="0 0 256 256"><path d="M141.66,133.66l-20-20,20-20a8,8,0,0,0-11.32-11.32l-20,20-20-20a8,8,0,0,0-11.32,11.32l20,20-20,20a8,8,0,0,0,11.32,11.32l20-20,20,20a8,8,0,0,0,11.32-11.32ZM224,128a96,96,0,1,1-96-96A96,96,0,0,1,224,128Zm-16,0a80,80,0,1,0-80,80A80,80,0,0,0,208,128Z"></path></svg>
-                <svg id="ped-w-walk" class="ped-icon w-8 h-8" viewBox="0 0 256 256"><path d="M152,216V164.33l-24.89-16.6-4.22,46.42a8,8,0,1,1-15.78-1.44l4.67-51.35a8,8,0,0,1,6.33-7.27l32-8.73a8,8,0,0,1,8.73,6.33L160,152v64a8,8,0,0,1-16,0Zm51.34-118a8,8,0,0,0-8.8-7.14l-48,8a8,8,0,0,0-6.33,7.27l-5.34,58.73a8,8,0,1,0,15.78,1.44L155,115.3l37.56-6.26a8,8,0,0,0,7.14-8.8ZM120,60a28,28,0,1,0-28-28A28,28,0,0,0,120,60Zm0-40a12,12,0,1,1-12,12A12,12,0,0,1,120,20Z"></path></svg>
-            </div>
-            <!-- West Traffic Light -->
+        <div class="absolute left-8 top-1/2 -translate-y-1/2 flex items-center space-x-4">
             <div class="traffic-light-box flex space-x-2">
                 <div id="w-red" class="light"></div>
                 <div id="w-yellow" class="light"></div>
+                <!-- THIS WAS THE BUG. It is now fixed. -->
                 <div id="w-green" class="light"></div>
+            </div>
+            <div id="ped-w-dont" class="ped-light">
+                <!-- Red Hand Icon -->
+                <svg viewBox="0 0 24 24"><path d="M16.5 20c.83 0 1.5-.67 1.5-1.5v-7c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5zm-4.5-1.5v-7c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5zm-3-1.5v-7c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5zM19 8.5v-4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v4c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5zM5 10c.83 0 1.5-.67 1.5-1.5v-4c0-.83-.67-1.5-1.5-1.5S3.5 3.67 3.5 4.5v4c0 .83.67 1.5 1.5 1.5zM18.2 9.5c.5-2.8-.5-5.6-2.6-7.5-1.3-1.2-3-1.9-4.8-2-1.8-.1-3.6.6-4.9 1.8-.7.6-1.3 1.4-1.8 2.2-.4.7-.7 1.5-.8 2.3-.1.8 0 1.6.2 2.4.2.8.5 1.5.9 2.2.4.7.9 1.3 1.5 1.8 1.2 1.2 2.8 1.9 4.4 2 1.6.1 3.2-.4 4.5-1.3.4-.3.8-.6 1.1-1 .3-.4.6-.8.8-1.2s.3-.9.4-1.4z"></path></svg>
+            </div>
+            <div id="ped-w-walk" class="ped-light">
+                <!-- Walk Icon -->
+                <svg viewBox="0 0 24 24"><path d="M14.5 9.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM12.5 12.4l-1.4 4 1.9.7 1.4-4c.1-.3 0-.6-.3-.7-.2-.1-.5 0-.6.2zM15 12.9c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM8.5 20v-5h-2v5c0 1.1.9 2 2 2s2-.9 2-2zM12.4 20c0-1.1.9-2 2-2s2 .9 2 2v-6.3l-1.9-.7 1.4 4.3c.2.6-.1 1.2-.7 1.4-.6.2-1.2-.1-1.4-.7l-1.4-4.3v6.3zM10.5 8.5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM6.5 13c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM8.5 8.5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM12 4.5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
             </div>
         </div>
 
-        <!-- Center Panel -->
-        <div class="col-start-2 row-start-2 bg-gray-700 p-4 rounded-lg shadow-inner text-center flex flex-col justify-center items-center">
-            <div class="text-lg font-medium">FSM State</div>
-            <div id="fsm-state" class="text-2xl font-bold text-cyan-400">...</div>
-            <div class="text-lg font-medium mt-2">Timer</div>
-            <div id="fsm-timer" class="text-2xl font-bold text-cyan-400">...</div>
-        </div>
-
         <!-- East Signal -->
-        <div class="col-start-3 row-start-2 flex items-center justify-start">
-            <!-- East Traffic Light -->
+        <div class="absolute right-8 top-1/2 -translate-y-1/2 flex flex-row-reverse items-center space-x-4 space-x-reverse">
             <div class="traffic-light-box flex space-x-2">
                 <div id="e-red" class="light"></div>
                 <div id="e-yellow" class="light"></div>
                 <div id="e-green" class="light"></div>
             </div>
-             <!-- East Ped Signal -->
-             <div class="ped-signal-box ml-2 flex">
-                <svg id="ped-e-dont" class="ped-icon w-8 h-8" viewBox="0 0 256 256"><path d="M141.66,133.66l-20-20,20-20a8,8,0,0,0-11.32-11.32l-20,20-20-20a8,8,0,0,0-11.32,11.32l20,20-20,20a8,8,0,0,0,11.32,11.32l20-20,20,20a8,8,0,0,0,11.32-11.32ZM224,128a96,96,0,1,1-96-96A96,96,0,0,1,224,128Zm-16,0a80,80,0,1,0-80,80A80,80,0,0,0,208,128Z"></path></svg>
-                <svg id="ped-e-walk" class="ped-icon w-8 h-8" viewBox="0 0 256 256"><path d="M152,216V164.33l-24.89-16.6-4.22,46.42a8,8,0,1,1-15.78-1.44l4.67-51.35a8,8,0,0,1,6.33-7.27l32-8.73a8,8,0,0,1,8.73,6.33L160,152v64a8,8,0,0,1-16,0Zm51.34-118a8,8,0,0,0-8.8-7.14l-48,8a8,8,0,0,0-6.33,7.27l-5.34,58.73a8,8,0,1,0,15.78,1.44L155,115.3l37.56-6.26a8,8,0,0,0,7.14-8.8ZM120,60a28,28,0,1,0-28-28A28,28,0,0,0,120,60Zm0-40a12,12,0,1,1-12,12A12,12,0,0,1,120,20Z"></path></svg>
+            <div id="ped-e-dont" class="ped-light">
+                <!-- Red Hand Icon -->
+                <svg viewBox="0 0 24 24"><path d="M16.5 20c.83 0 1.5-.67 1.5-1.5v-7c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5zm-4.5-1.5v-7c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5zm-3-1.5v-7c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5zM19 8.5v-4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v4c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5zM5 10c.83 0 1.5-.67 1.5-1.5v-4c0-.83-.67-1.5-1.5-1.5S3.5 3.67 3.5 4.5v4c0 .83.67 1.5 1.5 1.5zM18.2 9.5c.5-2.8-.5-5.6-2.6-7.5-1.3-1.2-3-1.9-4.8-2-1.8-.1-3.6.6-4.9 1.8-.7.6-1.3 1.4-1.8 2.2-.4.7-.7 1.5-.8 2.3-.1.8 0 1.6.2 2.4.2.8.5 1.5.9 2.2.4.7.9 1.3 1.5 1.8 1.2 1.2 2.8 1.9 4.4 2 1.6.1 3.2-.4 4.5-1.3.4-.3.8-.6 1.1-1 .3-.4.6-.8.8-1.2s.3-.9.4-1.4z"></path></svg>
+            </div>
+            <div id="ped-e-walk" class="ped-light">
+                <!-- Walk Icon -->
+                <svg viewBox="0 0 24 24"><path d="M14.5 9.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM12.5 12.4l-1.4 4 1.9.7 1.4-4c.1-.3 0-.6-.3-.7-.2-.1-.5 0-.6.2zM15 12.9c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM8.5 20v-5h-2v5c0 1.1.9 2 2 2s2-.9 2-2zM12.4 20c0-1.1.9-2 2-2s2 .9 2 2v-6.3l-1.9-.7 1.4 4.3c.2.6-.1 1.2-.7 1.4-.6.2-1.2-.1-1.4-.7l-1.4-4.3v6.3zM10.5 8.5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM6.5 13c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM8.5 8.5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM12 4.5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
             </div>
         </div>
 
-        <!-- Bottom-Left Corner (Empty) -->
-        <div class="col-start-1 row-start-3"></div>
+    </div>
 
-        <!-- South Signal -->
-        <div class="col-start-2 row-start-3 flex flex-col items-center justify-start">
-            <!-- South Traffic Light -->
-            <div class="traffic-light-box flex flex-col space-y-2">
-                <div id="s-red" class="light"></div>
-                <div id="s-yellow" class="light"></div>
-                <div id="s-green" class="light"></div>
+    <!-- Control Panel -->
+    <div class="w-full max-w-3xl mt-8 bg-gray-900 rounded-lg shadow-2xl p-6 flex items-center justify-between">
+        <!-- Status Display -->
+        <div class="flex gap-8">
+            <div class="text-center">
+                <div class="text-sm font-medium text-gray-400 uppercase">FSM State</div>
+                <div id="fsm-state" class="text-3xl font-bold text-cyan-400 w-32 truncate">...</div>
             </div>
-            <!-- South Ped Signal -->
-            <div class="ped-signal-box mt-2">
-                <svg id="ped-s-dont" class="ped-icon w-8 h-8" viewBox="0 0 256 256"><path d="M141.66,133.66l-20-20,20-20a8,8,0,0,0-11.32-11.32l-20,20-20-20a8,8,0,0,0-11.32,11.32l20,20-20,20a8,8,0,0,0,11.32,11.32l20-20,20,20a8,8,0,0,0,11.32-11.32ZM224,128a96,96,0,1,1-96-96A96,96,0,0,1,224,128Zm-16,0a80,80,0,1,0-80,80A80,80,0,0,0,208,128Z"></path></svg>
-                <svg id="ped-s-walk" class="ped-icon w-8 h-8" viewBox="0 0 256 256"><path d="M152,216V164.33l-24.89-16.6-4.22,46.42a8,8,0,1,1-15.78-1.44l4.67-51.35a8,8,0,0,1,6.33-7.27l32-8.73a8,8,0,0,1,8.73,6.33L160,152v64a8,8,0,0,1-16,0Zm51.34-118a8,8,0,0,0-8.8-7.14l-48,8a8,8,0,0,0-6.33,7.27l-5.34,58.73a8,8,0,1,0,15.78,1.44L155,115.3l37.56-6.26a8,8,0,0,0,7.14-8.8ZM120,60a28,28,0,1,0-28-28A28,28,0,0,0,120,60Zm0-40a12,12,0,1,1-12,12A12,12,0,0,1,120,20Z"></path></svg>
+            <div class="text-center">
+                <div class="text-sm font-medium text-gray-400 uppercase">Timer</div>
+                <div id="fsm-timer" class="text-3xl font-bold text-cyan-400 w-20">...</div>
             </div>
         </div>
-
-        <!-- Bottom-Right Corner (Empty) -->
-        <div class="col-start-3 row-start-3"></div>
+        
+        <!-- Control Buttons -->
+        <div class="flex gap-4">
+            <button id="btn-ped-request" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-200 shadow-lg active:scale-95 transform">
+                Pedestrian Request
+            </button>
+            <button id="btn-reset" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-200 shadow-lg active:scale-95 transform">
+                Reset FSM
+            </button>
+        </div>
     </div>
 
-    <!-- Control Buttons -->
-    <div class="flex justify-center gap-6 mt-8">
-        <button id="btn-ped-request" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-200 shadow-lg active:scale-95">
-            Pedestrian Request
-        </button>
-        <button id="btn-reset" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-200 shadow-lg active:scale-95">
-            Reset FSM
-        </button>
-    </div>
 
     <script>
-        // Get all the light elements
-        const lights = {
-            // North
+        // --- Get Element References ---
+        // We get references once at the start for performance.
+        const elements = {
+            fsmState: document.getElementById('fsm-state'),
+            fsmTimer: document.getElementById('fsm-timer'),
+            
+            // NS Lights
             nRed: document.getElementById('n-red'),
             nYellow: document.getElementById('n-yellow'),
             nGreen: document.getElementById('n-green'),
-            // South
+            // South Lights
             sRed: document.getElementById('s-red'),
             sYellow: document.getElementById('s-yellow'),
             sGreen: document.getElementById('s-green'),
-            // East
+            // East Lights
             eRed: document.getElementById('e-red'),
             eYellow: document.getElementById('e-yellow'),
             eGreen: document.getElementById('e-green'),
-            // West
+            // West Lights
             wRed: document.getElementById('w-red'),
             wYellow: document.getElementById('w-yellow'),
             wGreen: document.getElementById('w-green'),
@@ -184,29 +226,25 @@
             pedWDont: document.getElementById('ped-w-dont')
         };
 
-        const status = {
-            fsmState: document.getElementById('fsm-state'),
-            fsmTimer: document.getElementById('fsm-timer')
-        };
-        
         // --- Update UI Function ---
+        // This function is identical to your old one.
         function updateUI(fsmState) {
             // Update FSM Status
-            status.fsmState.textContent = fsmState.state;
-            status.fsmTimer.textContent = fsmState.timer_count;
+            elements.fsmState.textContent = fsmState.state;
+            elements.fsmTimer.textContent = fsmState.timer_count;
 
             // NS Lights (R, Y, G) -> Controls North and South
             const nsRedOn = fsmState.ns_light[0];
             const nsYellowOn = fsmState.ns_light[1];
             const nsGreenOn = fsmState.ns_light[2];
 
-            lights.nRed.classList.toggle('red-on', nsRedOn);
-            lights.nYellow.classList.toggle('yellow-on', nsYellowOn);
-            lights.nGreen.classList.toggle('green-on', nsGreenOn);
+            elements.nRed.classList.toggle('red-on', nsRedOn);
+            elements.nYellow.classList.toggle('yellow-on', nsYellowOn);
+            elements.nGreen.classList.toggle('green-on', nsGreenOn);
             
-            lights.sRed.classList.toggle('red-on', nsRedOn);
-            lights.sYellow.classList.toggle('yellow-on', nsYellowOn);
-            lights.sGreen.classList.toggle('green-on', nsGreenOn);
+            elements.sRed.classList.toggle('red-on', nsRedOn);
+            elements.sYellow.classList.toggle('yellow-on', nsYellowOn);
+            elements.sGreen.classList.toggle('green-on', nsGreenOn);
 
             
             // EW Lights (R, Y, G) -> Controls East and West
@@ -214,33 +252,34 @@
             const ewYellowOn = fsmState.ew_light[1];
             const ewGreenOn = fsmState.ew_light[2];
 
-            lights.eRed.classList.toggle('red-on', ewRedOn);
-            lights.eYellow.classList.toggle('yellow-on', ewYellowOn);
-            lights.eGreen.classList.toggle('green-on', ewGreenOn);
+            elements.eRed.classList.toggle('red-on', ewRedOn);
+            elements.eYellow.classList.toggle('yellow-on', ewYellowOn);
+            elements.eGreen.classList.toggle('green-on', ewGreenOn);
 
-            lights.wRed.classList.toggle('red-on', ewRedOn);
-            lights.wYellow.classList.toggle('yellow-on', ewYellowOn);
-            lights.wGreen.classList.toggle('green-on', ewGreenOn);
+            elements.wRed.classList.toggle('red-on', ewRedOn);
+            elements.wYellow.classList.toggle('yellow-on', ewYellowOn);
+            elements.wGreen.classList.toggle('green-on', ewGreenOn);
 
 
             // Ped Lights (Don't Walk, Walk) -> Controls all 4 signals
             const pedDontWalkOn = fsmState.ped_light[0];
             const pedWalkOn = fsmState.ped_light[1];
 
-            lights.pedNDont.classList.toggle('ped-dont-walk-on', pedDontWalkOn);
-            lights.pedNWalk.classList.toggle('ped-walk-on', pedWalkOn);
+            elements.pedNDont.classList.toggle('ped-dont-walk-on', pedDontWalkOn);
+            elements.pedNWalk.classList.toggle('ped-walk-on', pedWalkOn);
             
-            lights.pedSDont.classList.toggle('ped-dont-walk-on', pedDontWalkOn);
-            lights.pedSWalk.classList.toggle('ped-walk-on', pedWalkOn);
+            elements.pedSDont.classList.toggle('ped-dont-walk-on', pedDontWalkOn);
+            elements.pedSWalk.classList.toggle('ped-walk-on', pedWalkOn);
 
-            lights.pedEDont.classList.toggle('ped-dont-walk-on', pedDontWalkOn);
-            lights.pedEWalk.classList.toggle('ped-walk-on', pedWalkOn);
+            elements.pedEDont.classList.toggle('ped-dont-walk-on', pedDontWalkOn);
+            elements.pedEWalk.classList.toggle('ped-walk-on', pedWalkOn);
 
-            lights.pedWDont.classList.toggle('ped-dont-walk-on', pedDontWalkOn);
-            lights.pedWWalk.classList.toggle('ped-walk-on', pedWalkOn);
+            elements.pedWDont.classList.toggle('ped-dont-walk-on', pedDontWalkOn);
+            elements.pedWWalk.classList.toggle('ped-walk-on', pedWalkOn);
         }
 
         // --- Fetch Status from Server ---
+        // This function is identical to your old one.
         async function fetchStatus() {
             try {
                 const response = await fetch('/api/status');
@@ -249,13 +288,14 @@
                 updateUI(fsmState);
             } catch (error) {
                 console.error('Error fetching FSM status:', error);
-                // Show error state?
-                status.fsmState.textContent = "Error";
-                status.fsmTimer.textContent = "---";
+                // Show error state
+                elements.fsmState.textContent = "Error";
+                elements.fsmTimer.textContent = "---";
             }
         }
 
         // --- Send Input to Server ---
+        // This function is identical to your old one.
         async function sendInput(signalType) {
             try {
                 await fetch('/api/input', {
@@ -273,6 +313,7 @@
         }
 
         // --- Event Listeners ---
+        // This is identical to your old one.
         document.getElementById('btn-ped-request').addEventListener('click', () => sendInput('pedestrian_request'));
         document.getElementById('btn-reset').addEventListener('click', () => sendInput('reset'));
 
