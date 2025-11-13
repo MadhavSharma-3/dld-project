@@ -1,0 +1,64 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Sun Nov 09 19:40:13 2025
+[*]
+[dumpfile] "D:\College\Dld_project\Madhavrepo\dld-project\simulation_waves.vcd"
+[dumpfile_mtime] "Sun Nov 09 19:29:42 2025"
+[dumpfile_size] 11453
+[savefile] "D:\College\Dld_project\Madhavrepo\dld-project\final_waveform.gtkw"
+[timestart] 0
+[size] 1536 793
+[pos] -191 -186
+*-44.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 197
+[signals_width] 182
+[sst_expanded] 1
+[sst_vpaned_height] 221
+@28
+[color] 2
+tb_traffic_light_controller.clk
+@20000
+-
+@28
+tb_traffic_light_controller.ew_light_g
+@20000
+-
+@28
+[color] 3
+tb_traffic_light_controller.ew_light_y
+@20000
+-
+@28
+[color] 1
+tb_traffic_light_controller.ew_light_r
+@20000
+-
+@28
+tb_traffic_light_controller.ns_light_g
+@20000
+-
+@28
+[color] 3
+tb_traffic_light_controller.ns_light_y
+@20000
+-
+@28
+[color] 1
+tb_traffic_light_controller.ns_light_r
+@20000
+-
+@28
+[color] 6
+tb_traffic_light_controller.pedestrian_request
+@20000
+-
+@28
+[color] 1
+tb_traffic_light_controller.ped_light_dont_walk
+@20000
+-
+@28
+[color] 4
+tb_traffic_light_controller.ped_light_walk
+[pattern_trace] 1
+[pattern_trace] 0
